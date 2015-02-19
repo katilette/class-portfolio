@@ -1,0 +1,6 @@
+#ifndef LILYPAD_BITMAP_H
+#define LILYPAD_BITMAP_H
+extern volatile const u16 lilypad[345000];
+#define LILYPAD_WIDTH 600
+#define LILYPAD_HEIGHT 575
+#endif

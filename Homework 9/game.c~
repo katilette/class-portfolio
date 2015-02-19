@@ -1,0 +1,103 @@
+#include "mylib.h"
+#include "game.h"
+#include "lilypad.h"
+#include <stdlib.h>
+#include <stdio.h>
+
+void printLives(int lives)
+{
+	char buffer[15];
+	drawRect(150, 150, 10, 24, GREEN);
+	sprintf(buffer, "%u", lives);
+	drawString(150, 150, buffer, RED);
+}
+
+void printTimer(int timer)
+{
+	char buffer[15];
+	drawRect(150, 40, 10, 24, GREEN);
+	sprintf(buffer, "%u", SCANLINECOUNTER);
+	drawString(150, 40, buffer, RED);
+}
+
+void setBackground()
+{
+	//grass
+	drawRect(0,0, 240, 240, GREEN);
+	//river
+	drawRect(20,0, 60, 240, BLUE);
+	//road
+	drawRect(100,0, 35, 240, BLACK);
+	int i;
+	for (i=0; i < 240; i+= 20) { //draw white lines for lanes of traffic
+		drawRect(111, 0+i,1,5,WHITE);
+		drawRect(122, 0+i,1,5,WHITE);
+	}
+	drawString(150, 3, "Timer:", BLACK);
+	drawString(150, 103, "Lives:", BLACK);	
+}
+
+void titleScreen() 
+{
+	drawRect(0,0, 240, 240, GREEN);
+	drawImage3(0, 0, LILYPAD_WIDTH, LILYPAD_HEIGHT, lilypad);
+	drawString(130, 70, "Press START to continue", RED);
+}
+
+void gameOverScreen()
+{
+	drawRect(0,0, 240, 240, BLACK);
+	drawString(150, 3, "GAME OVER", GREEN);
+}
+
+void winScreen() 
+{
+	drawRect(0,0, 240, 240, BLACK);
+	drawString(150, 3, "YOU WIN!! :D", GREEN);
+}
+
+void loseScreen()
+{
+	drawRect(0,0, 240, 240, BLACK);
+	drawString(150, 3, "You lost. Try again? (Press START)", GREEN);
+}
+
+int detectCollision(int r1Left, int r1Bottom, int r1Right, int r1Top, int r2Top, int r2Left, int r2Right, int r2Bottom) { 
+	//needs to be O(1)
+	if ((collideH(r1Left, r2Left, r1Right, r2Right) && collideV(r1Top, r2Top, r1Bottom, r2Bottom))) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
+int collisioncheck(int r1Left, int r1Top, int r2Left, int r2Bottom, int r2Top, int r2Right)
+{
+	if (r2Left < r1Left && r1Left < r2Right) {
+		if (r2Top < r1Top && r1Top < r2Bottom) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+int collideH(int r1Left, int r2Left, int r1Right, int r2Right) {
+	int isHorizontalCollision = FALSE;	
+	if (r1Left < r2Left && r2Left < r1Right) {
+		isHorizontalCollision = TRUE;
+	}
+	if (r1Left < r2Right && r2Right < r1Right) {
+		isHorizontalCollision = TRUE;
+	}
+	return isHorizontalCollision;
+}
+
+int collideV(int r1Top, int r2Top, int r1Bottom, int r2Bottom) {
+	int isVerticalCollision = FALSE;
+	if (r1Top < r2Top && r2Top < r1Bottom) {
+		isVerticalCollision = TRUE;
+	}
+	if (r1Top < r2Bottom && r2Bottom < r1Bottom) {
+    		isVerticalCollision = TRUE;
+	}
+	return isVerticalCollision;
+}
