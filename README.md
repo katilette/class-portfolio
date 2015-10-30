@@ -1,1 +1,1 @@
-# fuzzy-octo-nemesis
+# Examples of class assignments
