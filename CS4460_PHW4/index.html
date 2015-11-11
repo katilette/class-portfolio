@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <link href='style.css' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <h1>PHW4: Linking</h1>
+    <div class="wrap">
+      <div class="chart"></div>
+      <div class="scatterplot"></div>
+    </div>
+
+    <!-- External js libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+
+    <!-- Our js files -->
+    <script src="scatter.js"></script>
+    <script src="library.js"></script>
+
+    <script>
+
+    /* Setting document and chart properties */
+    var margin1 = {top: 20, right: 20, bottom: 200, left: 40},
+        width1 = 400 - margin1.left - margin1.right,
+        height1 = 600 - margin1.top - margin1.bottom;
+    /* Setting the range for X */
+    var x1 = d3.scale.ordinal()
+        .rangeRoundBands([0, width1], .5);
+    /* Setting the range for Y */
+    var y1 = d3.scale.linear()
+        .range([height1, 0]);
+    /* Creating the X Axis */
+    var xAxis1 = d3.svg.axis()
+      .scale(x1)
+      .orient("bottom");
+    /* Creating the Y Axis */
+    var yAxis1 = d3.svg.axis()
+        .scale(y1)
+        .orient("left");
+    /* Creating an SVG canvas */
+    var bar = d3.select(".chart").append("svg")
+        .attr("width", width1 + margin1.left + margin1.right)
+        .attr("height", height1 + margin1.top + margin1.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin1.left + "," + margin1.top + ")");
+
+    /* Load data from file with a specific type function */
+    d3.csv("Cereal.csv", type, function(error, data) {
+      //get calories and manufacturers together
+      temp = {};
+
+      for (var obj in data) {
+        if (data[obj]["Manufacturer"] in temp) {
+          temp[(data[obj]["Manufacturer"])].push(parseInt(data[obj]["Calories"]));
+        } else {
+          temp[data[obj]["Manufacturer"]] = [parseInt(data[obj]["Calories"])];
+        }
+      }
+      //find averages from the manufacturers
+      allAveragesArr = [];
+
+      for (var obj in temp) {
+
+        tempAveragesObj = {};
+
+        var sum = temp[obj].reduce(function(a, b) {
+          return a + b;
+        });
+
+        tempAveragesObj["Manufacturer"] = obj;
+        tempAveragesObj["Avg"] = sum / temp[obj].length; //finds average
+        allAveragesArr.push(tempAveragesObj);
+      }
+
+      if (error) throw error;
+
+      /* Setting the domain for X and Y */
+      x1.domain(allAveragesArr.map(function(d) { return d.Manufacturer; }));
+      y1.domain([0, d3.max(allAveragesArr, function(d) { return d.Avg; })]);
+
+      /* Drawing the X and Y axes */
+      drawXAxis();
+      drawYAxis();
+
+      /* Drawing the Bars */
+      drawBars(allAveragesArr);
+
+    });
+
+    function type(d) {
+      d.frequency = +d.frequency;
+      return d;
+    }
+  </script>
+
+  </body>
+</html>
